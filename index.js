@@ -1,47 +1,75 @@
+document.getElementById("getComments").addEventListener("click", getComment);
+function getComment() {
+  fetch("https://jsonplaceholder.typicode.com/comments")
+    .then((res) => res.json())
+    .then((data) => {
+      let output = `<h2 class="mb-4">Comments</h2>`;
+      data.forEach((comments) => {
+        output += `<ul class="list-group mb-3">
+            <li class="list-group-item active">ID: ${comments.id}</li>
+            <li class="list-group-item">Name: ${comments.name}</li>
+            <li class="list-group-item">Email: ${comments.email}</li>
+            <li class="list-group-item">Body: ${comments.body}</li>
+            </ul>`;
+      });
+      document.getElementById("output").innerHTML = output;
+    })
+    .catch((err) => console.log(err));
+}
 
-//jshint esversion:6
-const express = require("express");
-const https = require("https");
-const bodyParser = require("body-parser");
-const app  = express();
+document.getElementById("getUsers").addEventListener("click", getUsers);
+function getUsers() {
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then((res) => res.json())
+    .then((data) => {
+      let output = `<h2 class="mb-4">Users</h2>`;
+      data.forEach((user) => {
+        output += `<ul class="list-group mb-3">
+          <li class="list-group-item  active">ID: ${user.id}</li>
+          <li class="list-group-item">Name: ${user.name}</li>
+          <li class="list-group-item">Email: ${user.email}</li>
+          <li class="list-group-item">Address: ${user.address.city}, ${user.address.street}</li>
+          <li class="list-group-item">Phone: ${user.phone}</li>
+          <li class="list-group-item">Website: ${user.website}</li>
+          <li class="list-group-item">Company: ${user.company.name}, ${user.company.catchPhrase}</li>
+          </ul>`;
+      });
+      document.getElementById("output").innerHTML = output;
+    });
+}
 
-app.use(bodyParser.urlencoded({extended:true}));
-app.get("/",function(req,res)
-{
-res.sendFile(__dirname+"/index.html");
-});
-app.post("/",function(req,res)
-{
-const query = req.body.cityname;
-const key ="1c837b6b0a538417ec9364dff31f8a9f";
-const unit = "metric";
-const url = "https://api.openweathermap.org/data/2.5/weather?q="+query+"&appid="+key+"&units="+unit;
+document.getElementById("getPosts").addEventListener("click", getPosts);
+function getPosts() {
+  fetch("https://jsonplaceholder.typicode.com/posts")
+    .then((res) => res.json())
+    .then((data) => {
+      let output = `<h2 class="mb-4">Posts</h2>`;
+      data.forEach((post) => {
+        output += `
+          <div class="card card-body mb-3">
+          <h3>${post.title}</h3>
+          <p>${post.body}</p>
+          </div>
+          `;
+      });
+      document.getElementById("output").innerHTML = output;
+    });
+}
 
+document.getElementById("addPost").addEventListener("submit", addPost);
+function addPost(e) {
+  e.preventDefault();
+  let title = document.getElementById("title").value;
+  let body = document.getElementById("body").value;
 
-https.get(url,function(response,request)
-{
-console.log(response.statusCode);
-response.on("data",function(data)
-{
-console.log(data);
-const weatherdata = JSON.parse(data);
-console.log(weatherdata);
-const temp = weatherdata.main.temp;
-const weatherdesc = weatherdata.weather[0].description;
-const icon = weatherdata.weather[0].icon;
-const imgurl = "http://openweathermap.org/img/wn/"+icon+"@2x.png";
-res.write("<h1>The Temperature in "+query+" is "+temp+ " degree <br> desc are </h1>" + weatherdesc);
-res.write("<img src="+imgurl+">");
-
-res.send();
-
-});
-});
-});
-
-
-
-app.listen(3000,function()
-{
-  console.log("server is running on port 3000");
-});
+  fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ title: title, body: body }),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log(data));
+}
